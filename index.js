@@ -32,11 +32,11 @@ async function run() {
         await client.connect();
 
         // Database and collection
-        const allUsers = client.db("sipSavorRestaurant").collection("users");
         const allFoods = client.db("sipSavorRestaurant").collection("foods");
+        const allUserPurchases = client.db("sipSavorRestaurant").collection("userPurchases");
 
         // Get all the food items
-        app.get("/allfoods", async(req, res) => {
+        app.get("/allfoods", async (req, res) => {
             const result = await allFoods.find().toArray();
             res.send(result);
         })
@@ -44,8 +44,16 @@ async function run() {
         // Get single food item using product ID
         app.get("/allfoods/:id", async (req, res) => {
             const id = req.params.id;
-            const query = { _id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await allFoods.findOne(query);
+            res.send(result);
+        })
+
+        // Create new data for user purchased collection
+        app.post("/purchasedProducts", async (req, res) => {
+            const newPurchase = req.body;
+            const result = await allUserPurchases.insertOne(newPurchase);
+            console.log(result);
             res.send(result);
         })
 
