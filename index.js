@@ -53,7 +53,22 @@ async function run() {
         app.post("/purchasedProducts", async (req, res) => {
             const newPurchase = req.body;
             const result = await allUserPurchases.insertOne(newPurchase);
-            console.log(result);
+            res.send(result);
+        })
+
+        // update existing product data for allFoods
+        app.put("/allfoods/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedProductInfo = req.body;
+            const updateDoc = {
+                $set: {
+                    foodQuantity: updatedProductInfo.reaminingQuantity,
+                    orderCount: updatedProductInfo.totalOrder,
+                }
+            };
+            const result = await allFoods.updateOne(filter, updateDoc, options);
             res.send(result);
         })
 
