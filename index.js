@@ -73,10 +73,19 @@ async function run() {
             res.send({ success: true });
         })
 
-        
+
+        // get the total number of food items in the allFoods collection
+        app.get("/totalfoods", async (req, res) => {
+            const total = await allFoods.estimatedDocumentCount();
+            res.send({ total });
+        })
+
         // Get all the food items
         app.get("/allfoods", async (req, res) => {
-            const result = await allFoods.find().toArray();
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
+            console.log("pagination query", req.query);
+            const result = await allFoods.find().skip(page * size).limit(size).toArray();
             res.send(result);
         })
 
