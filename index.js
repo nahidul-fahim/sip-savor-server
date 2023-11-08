@@ -65,6 +65,14 @@ async function run() {
             res.send(result);
         })
 
+        // Create new product from client side profile add new product form
+        app.post("/addnewproduct", async (req, res) => {
+            const newProduct = req.body;
+            const result = await allFoods.insertOne(newProduct);
+            res.send(result);
+        })
+
+
         // update existing quantity and total order count for allFoods
         app.put("/allfoods/:id", async (req, res) => {
             const id = req.params.id;
@@ -100,7 +108,9 @@ async function run() {
                     foodCategory: updatedProductInfo.foodCategory,
                 }
             };
-            const result = await allFoods.updateOne(filter, updateDoc, options)
+            const result = await allFoods.updateOne(filter, updateDoc, options);
+            console.log(result);
+            res.send(result);
         })
 
 
