@@ -52,8 +52,8 @@ async function run() {
         // Get food items for the current user
         app.get("/userFoods/:id", async (req, res) => {
             const email = req.params.id;
-            const query = { addedBy: email};
-            const result = await allFoods.findOne(query);
+            const query = { addedBy: email };
+            const result = await allFoods.find(query).toArray();
             res.send(result);
         })
 
@@ -65,7 +65,7 @@ async function run() {
             res.send(result);
         })
 
-        // update existing product data for allFoods
+        // update existing quantity and total order count for allFoods
         app.put("/allfoods/:id", async (req, res) => {
             const id = req.params.id;
             const filter = { _id: new ObjectId(id) };
@@ -81,6 +81,27 @@ async function run() {
             res.send(result);
         })
 
+
+        // Update product info from client side user profile product updating form
+        app.put("/updateFood/:id", async (req, res) => {
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) };
+            const options = { upsert: true };
+            const updatedProductInfo = req.body;
+            const updateDoc = {
+                $set: {
+                    food: updatedProductInfo.food,
+                    price: updatedProductInfo.price,
+                    foodQuantity: updatedProductInfo.foodQuantity,
+                    foodImage: updatedProductInfo.foodImage,
+                    cookerName: updatedProductInfo.cookerName,
+                    foodOriginCountry: updatedProductInfo.foodOriginCountry,
+                    foodDescription: updatedProductInfo.foodDescription,
+                    foodCategory: updatedProductInfo.foodCategory,
+                }
+            };
+            const result = await allFoods.updateOne(filter, updateDoc, options)
+        })
 
 
         // Send a ping to confirm a successful connection
