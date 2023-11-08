@@ -49,6 +49,15 @@ async function run() {
             res.send(result);
         })
 
+        // Get food items for the current user
+        app.get("/userFoods/:id", async (req, res) => {
+            const email = req.params.id;
+            const query = { addedBy: email};
+            const result = await allFoods.findOne(query);
+            res.send(result);
+        })
+
+
         // Create new data for user purchased collection
         app.post("/purchasedProducts", async (req, res) => {
             const newPurchase = req.body;
