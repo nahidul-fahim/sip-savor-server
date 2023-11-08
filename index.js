@@ -81,10 +81,18 @@ async function run() {
         })
 
         // Get all the food items
-        app.get("/allfoods", async (req, res) => {
+        app.get("/foodsoncollection", async (req, res) => {
             const page = parseInt(req.query.page);
             const size = parseInt(req.query.size);
             const result = await allFoods.find().skip(page * size).limit(size).toArray();
+            res.send(result);
+        })
+
+        // get all the foods
+        app.get("/allfoods", async (req, res) => {
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
+            const result = await allFoods.find().toArray();
             res.send(result);
         })
 
