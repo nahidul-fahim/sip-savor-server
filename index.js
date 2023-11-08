@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174'],
+    origin: ['https://sip-savor-restaurant.web.app/', 'https://sip-savor-restaurant.firebaseapp.com/'],
     credentials: true,
 }));
 app.use(express.json());
@@ -84,7 +84,6 @@ async function run() {
         app.get("/allfoods", async (req, res) => {
             const page = parseInt(req.query.page);
             const size = parseInt(req.query.size);
-            console.log("pagination query", req.query);
             const result = await allFoods.find().skip(page * size).limit(size).toArray();
             res.send(result);
         })
