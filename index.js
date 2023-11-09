@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-    origin: ['https://sip-savor-restaurant.web.app/', 'https://sip-savor-restaurant.firebaseapp.com/'],
+    origin: ['https://sip-savor-restaurant.web.app', 'https://sip-savor-restaurant.firebaseapp.com'],
     credentials: true,
 }));
 app.use(express.json());
@@ -55,23 +55,42 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+        // await client.connect();
 
         // Database and collection
         const allFoods = client.db("sipSavorRestaurant").collection("foods");
         const allUserPurchases = client.db("sipSavorRestaurant").collection("userPurchases");
 
 
-        // JWT + Auth related api (Creating token and sending and recieving cookie)
-        app.post("/jwt", async (req, res) => {
+
+        // new post 2
+        app.post("/accesstokencreate", async (req, res) => {
+            try {
+                const user = req.body;
+                const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+                    expiresIn: "1hr",
+                });
+                res
+                    .cookie("token", token, {
+                        sameSite: "none",
+                        secure: true,
+                        httpOnly: true,
+                    })
+                    .send({ token });
+            } catch (error) {
+                res.status(401).send(error);
+            }
+        });
+
+
+
+        // new post
+        app.post("/signoutuser", async (req, res) => {
             const user = req.body;
-            const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
-            res.cookie('token', token, {
-                httpOnly: true,
-                secure: true,
-            });
-            res.send({ success: true });
-        })
+            res.clearCookie("token", { maxAge: 0 }).send({ clearsuccess: true });
+        });
+
+
 
 
         // get the total number of food items in the allFoods collection
@@ -193,7 +212,7 @@ async function run() {
 
 
         // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
+        // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
