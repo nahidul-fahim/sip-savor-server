@@ -20,15 +20,14 @@ app.use(cookieParser());
 
 // Custom middleware to verfy token
 const verifyToken = async (req, res, next) => {
-    const token = req.cookies?.token;
+    const token = req?.cookies?.token;
     if (!token) {
-        res.status(401).send({ message: 'Unauthorized user' })
+        res.status(401).send({ message: 'Unauthorized' })
     }
     // Verify token
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
         if (err) {
-            console.log("Error in token verifier: ", err)
-            return res.status(401).send({ message: 'Unauthorized user' })
+            return res.status(401).send({ message: 'Unauthorized' })
         }
         req.decoded = decoded;
         next();
@@ -63,12 +62,12 @@ async function run() {
 
 
 
-        // new post 2
-        app.post("/accesstokencreate", async (req, res) => {
+        // Get data from client side and create token
+        app.post("/tokencreate", async (req, res) => {
             try {
                 const user = req.body;
                 const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-                    expiresIn: "1hr",
+                    expiresIn: "1h",
                 });
                 res
                     .cookie("token", token, {
@@ -76,8 +75,9 @@ async function run() {
                         secure: true,
                         httpOnly: true,
                     })
-                    .send({ token });
-            } catch (error) {
+                    .send({ success: true });
+            }
+            catch (error) {
                 res.status(401).send(error);
             }
         });
@@ -91,15 +91,13 @@ async function run() {
         });
 
 
-
-
         // get the total number of food items in the allFoods collection
         app.get("/totalfoods", async (req, res) => {
             const total = await allFoods.estimatedDocumentCount();
             res.send({ total });
         })
 
-        // Get all the food items
+        // Get paginated food items
         app.get("/foodsoncollection", async (req, res) => {
             const page = parseInt(req.query.page);
             const size = parseInt(req.query.size);
