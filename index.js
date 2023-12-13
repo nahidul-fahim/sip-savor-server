@@ -9,7 +9,7 @@ const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-    origin: ['https://sip-savor-restaurant.web.app', 'https://sip-savor-restaurant.firebaseapp.com'],
+    origin: ['https://sip-savor-restaurant.web.app', 'https://sip-savor-restaurant.firebaseapp.com', 'http://localhost:5173'],
     credentials: true,
 }));
 app.use(express.json());
@@ -59,6 +59,7 @@ async function run() {
         // Database and collection
         const allFoods = client.db("sipSavorRestaurant").collection("foods");
         const allUserPurchases = client.db("sipSavorRestaurant").collection("userPurchases");
+        const postedStoriesCollection = client.db("sipSavorRestaurant").collection("postedStories");
 
 
 
@@ -83,12 +84,29 @@ async function run() {
         });
 
 
-
-        // new post
+        // token clear
         app.post("/signoutuser", async (req, res) => {
             const user = req.body;
             res.clearCookie("token", { maxAge: 0 }).send({ clearsuccess: true });
         });
+
+
+
+        // post new story by user in story collection
+        app.post("/newpost", async (req, res) => {
+            const newPost = req.body;
+            const result = await postedStoriesCollection.insertOne(newPost);
+            res.send(result);
+        })
+
+
+
+        // get all the posted story
+        app.get("/allposts", async (req, res) => {
+            const result = await postedStoriesCollection.find().toArray();
+            res.send(result);
+        })
+
 
 
         // get the total number of food items in the allFoods collection
